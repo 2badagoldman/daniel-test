@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Todos</title></head>
+<body>
+  <h1>Todos</h1>
+  <form id="f"><input id="t" placeholder="What needs doing?"><button>Add</button></form>
+  <p>
+    <button data-f="all">All</button><button data-f="active">Active</button><button data-f="completed">Completed</button>
+    <span id="left"></span>
+  </p>
+  <ul id="list"></ul>
+  <script type="module">
+    import { addTodo, toggle, remove, filterTodos, remaining } from './todos.js';
+    let todos = [], filter = 'all';
+    const render = () => {
+      list.innerHTML = '';
+      for (const t of filterTodos(todos, filter)) {
+        const li = document.createElement('li');
+        li.innerHTML = `<input type="checkbox" ${t.done ? 'checked' : ''}> ${t.text} <button>x</button>`;
+        li.querySelector('input').onchange = () => { todos = toggle(todos, t.id); render(); };
+        li.querySelector('button').onclick = () => { todos = remove(todos, t.id); render(); };
+        list.append(li);
+      }
+      left.textContent = `${remaining(todos)} left`;
+    };
+    f.onsubmit = (e) => { e.preventDefault(); try { todos = addTodo(todos, t.value); } catch {} t.value = ''; render(); };
+    document.querySelectorAll('[data-f]').forEach((b) => (b.onclick = () => { filter = b.dataset.f; render(); }));
+    render();
+  </script>
+</body>
+</html>
